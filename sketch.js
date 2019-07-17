@@ -1,18 +1,21 @@
 
-const canvasWidth = 825, canvasHeight = 525;
-const cols = 33, rows = 21;
+// Los valores de canvasWidth y de canvasHeight deben ser multiplos de 25 y al dividirlos entre 25
+// el resultado debe ser un numero impar...!
+const canvasWidth = 425, canvasHeight = 425;
+const cols = 17, rows = 17;
 const cellWidth = canvasWidth/cols, cellHeight = canvasHeight/rows;
-const cellCols = 17, cellRows = 11;
-var wallImage, starImage, current, cellsLoaded = false, playerPosX = 0, playerPosY = 0, grid = [], gridMemory = [], stack = [];
-var collidersGrid = [], startPoint = {x: 32, y: 20}, ladronClicked = false, ladron;
-var topConstrain, rightConstrain, bottomConstrain, leftConstrain, consX, consY, timer = 20, gameOver = false, youWin = false;
+const cellCols = ((cols - 1) / 2) + 1, cellRows = ((rows - 1) / 2) + 1;
+var wallImage, starImage;
+var current, cellsLoaded = false, grid = [], gridMemory = [], stack = [];
+var collidersGrid = [], startPoint = {x: cols - 1, y: rows - 1}, ladronClicked = false, ladron;
+var topConstrain, rightConstrain, bottomConstrain, leftConstrain, consX, consY, timer = 10, gameOver = false, youWin = false;
 
 function preload() {
    wallImage = loadImage('images/wall.png');
    starImage = loadImage("images/7.png");
 }
 
-function setup() {
+function setup(){
    createCanvas(canvasWidth, canvasHeight);
    background(0, 0, 0);
    frameRate(600);
@@ -50,7 +53,7 @@ function draw() {
       var xTemp = ladron.x;
       var yTemp = ladron.y;
       if(floor(xTemp/cellWidth) == 0 && floor(yTemp/cellHeight) == 0){
-         textSize(80);
+         textSize(50);
          fill(255);
          text("YOU WIN...!", canvasWidth/2, canvasHeight/2);
          youWin = true;
@@ -64,7 +67,7 @@ function draw() {
          timer--;
       }
       if (timer == 0) {
-         textSize(80);
+         textSize(50);
          fill(255);
          text("GAME OVER", canvasWidth/2, canvasHeight/2);
          gameOver = true;
@@ -72,7 +75,7 @@ function draw() {
       textAlign(CENTER, CENTER);
       textSize(20);
       fill(255);
-      text(timer, 811, 14);
+      text(timer, canvasWidth - 15, 15);
    }
 }
 
@@ -85,7 +88,7 @@ function mouseClicked(){
    if(gameOver){
       gameOver = false;
       ladronClicked = false;
-      timer = 20;
+      timer = 10;
       setup();
    }
    if(youWin){
@@ -93,7 +96,7 @@ function mouseClicked(){
       stack = [];
       gridMemory = [];
       loadCells();
-      timer = 20;
+      timer = 10;
       youWin = false;
       ladronClicked = false;
       setup();
@@ -103,10 +106,12 @@ function mouseClicked(){
 function getConstrains(x, y){
    var Xright; var Xleft; var Ytop; var Ybottom;
    var gridX = floor(x/cellWidth), gridY = floor(y/cellHeight);
+
    var top = (gridY - 1 < 0) ? false : collidersGrid[gridX][gridY - 1];
-   var right = (gridX + 1 > 32) ? false : collidersGrid[gridX + 1][gridY];
-   var bottom = (gridY + 1 > 20) ? false : collidersGrid[gridX][gridY + 1];
+   var right = (gridX + 1 > cols - 1) ? false : collidersGrid[gridX + 1][gridY];
+   var bottom = (gridY + 1 > rows - 1) ? false : collidersGrid[gridX][gridY + 1];
    var left = (gridX - 1 < 0) ? false : collidersGrid[gridX - 1][gridY];
+   
    Ytop = (top) ? ((gridY - 1) * cellHeight) + 12 : (gridY * cellHeight) + 12;
    Ybottom = (bottom) ? ((gridY + 2) * cellHeight) - 12 : ((gridY + 1) * cellHeight) - 12;
    Xright = (right) ? ((gridX + 2) * cellHeight) - 12 : ((gridX + 1) * cellHeight) - 12;
@@ -241,7 +246,4 @@ function Ladron(ladronX, ladronY){
    ellipse(ladronX - 9, ladronY - 5, 5, 5);
    ellipse(ladronX, ladronY - 5, 5, 5);
    fill(0);
-   //rect(ladronX - 10, ladronY+ 5, 1, 10);
-   //rect(ladronX, ladronY + 5, 1, 10);
-   //rect(ladronX + 10, ladronY + 5, 1, 10);
 }
